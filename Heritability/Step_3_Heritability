@@ -1,0 +1,29 @@
+#!/bin/bash
+#SBATCH --job-name=reml_variance
+#SBATCH --account=<ACCOUNT_NAME>
+#SBATCH --mem-per-cpu=4000
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=16
+#SBATCH --time=4:00:00
+#SBATCH --error=reml_variance.err
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# -----------------------------
+# User-defined paths
+# -----------------------------
+GCTA_EXEC="<PATH_TO_GCTA_EXECUTABLE>"        # e.g., /path/to/gcta64
+GRM_DIR="<PATH_TO_GRM_DIRECTORY>"           # Directory containing TargetSNPs GRM
+OUT_DIR="<OUTPUT_DIRECTORY>"                # Directory to save BLUP/REML results
+PHENO_FILE="<PATH_TO_PHENOTYPE_FILE>"      # Phenotype file, e.g., SBS_rate.tsv
+BFILE_PREFIX="TargetSNPs"                   # GRM file prefix
+
+# Run REML to estimate variance components and get BLUP
+"${GCTA_EXEC}" \
+  --reml \
+  --grm "${GRM_DIR}/${BFILE_PREFIX}" \
+  --pheno "${PHENO_FILE}" \
+  --reml-pred-rand \
+  --out "${OUT_DIR}/${BFILE_PREFIX}.BLUP"
