@@ -1,0 +1,32 @@
+#!/bin/bash
+
+#SBATCH --account=<ACCOUNT_NAME>
+#SBATCH --job-name=make_plink_files
+#SBATCH --time=01-00:00:00
+#SBATCH --mem=10GB
+#SBATCH --output=make_plink_files.out
+#SBATCH --error=make_plink_files.err
+
+module load PLINK/1.09b6.16
+
+# -----------------------------
+# User-defined input files
+# -----------------------------
+IID_FILE="<PATH_TO_IID_FILE>"        # Path to sample list (IID.tsv)
+VCF_FILE="<PATH_TO_VCF_FILE>"        # Path to input VCF file (gatk.vcf.gz)
+OUTPUT_PREFIX="<OUTPUT_DIR>/<PREFIX>"  # Output PLINK file prefix, e.g., ./PLINK/high_quality_PLINK
+
+plink --cow \
+  --allow-extra-chr \
+  --chr 1-29 \
+  --geno 0.05 \
+  --mind 0.05 \
+  --maf 0.01 \
+  --me 0.01 0.01 \
+  --const-fid 0 \
+  --keep "${IID_FILE}" \
+  --biallelic-only \
+  --set-missing-var-ids @_# \
+  --vcf "${VCF_FILE}" \
+  --make-bed \
+  --out "${OUTPUT_PREFIX}"
