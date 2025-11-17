@@ -1,0 +1,45 @@
+#!/bin/bash
+#
+#       Use GCTA to calculate the Additive GRM (partitioned)
+#
+#SBATCH --job-name=step_5_chr_AGRM_parts
+#SBATCH --account=<ACCOUNT_NAME>
+#SBATCH --mem-per-cpu=2048
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=3
+#SBATCH --time=6:00:00
+#SBATCH --array=1-50
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# -----------------------------
+# Input arguments
+# -----------------------------
+# $1 = input directory containing GRM binary files
+# $2 = chromosome number
+
+IN_DIR="$1"
+CHR="$2"
+
+# Paths to input and output files (no subfolders)
+IN_FILE="${IN_DIR}/gs_grm_chr${CHR}"
+OUT_FILE="${IN_DIR}/chr${CHR}_grm"
+
+# Path to GCTA software
+GCTA="<PATH_TO_GCTA_EXECUTABLE>"  # e.g., /path/to/gcta64
+
+# Partitioning settings
+PARTS=50
+NT=${SLURM_CPUS_PER_TASK:-1}
+MEM=$((${NT} * ${SLURM_MEM_PER_CPU}))
+PART=${SLURM_ARRAY_TASK_ID:-0}
+
+# Run GCTA to make partitioned GRM
+"${GCTA}" --bfile "${IN_FILE}" \
+          --make-grm-part "${PARTS}" "${PART}" \
+          --thread-num "${NT}" \
+          --out "${OUT_FILE}" \
+          --autosome-num 29 \
+          --autosome
