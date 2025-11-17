@@ -1,0 +1,31 @@
+#!/bin/bash
+#
+#       Remove GRM parts after concatenation
+#
+#SBATCH --job-name=remove_grm_parts
+#SBATCH --account=<ACCOUNT_NAME>
+#SBATCH --mem-per-cpu=2000
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --time=1:00:00
+#SBATCH --array=1-29   # Chromosomes 1-29
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# -----------------------------
+# Input argument
+# -----------------------------
+# $1 = directory containing the GRM part files
+OUTDIR="$1"
+
+# Chromosome to process based on SLURM array task ID
+CHR="${SLURM_ARRAY_TASK_ID}"
+OUTFILE="${OUTDIR}/chr${CHR}_grm"
+
+# Remove the GRM partition files
+rm -f "${OUTFILE}.part_"*.grm.id
+rm -f "${OUTFILE}.part_"*.grm.bin
+rm -f "${OUTFILE}.part_"*.grm.N.bin
+rm -f "${OUTFILE}.part_"*.log
