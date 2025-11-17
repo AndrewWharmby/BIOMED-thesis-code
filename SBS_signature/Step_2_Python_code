@@ -1,0 +1,30 @@
+# -----------------------------
+# SigProfilerAssignment script
+# -----------------------------
+import SigProfilerAssignment as spa
+from SigProfilerAssignment import Analyzer as Analyze
+
+# User-defined paths
+SAMPLES_FILE = "SBS96.txt"           # Input mutation matrix
+OUTPUT_DIR = "SigProfilerResults"    # Output directory
+
+# Perform COSMIC signature assignment
+Analyze.cosmic_fit(
+    samples=SAMPLES_FILE,
+    output=OUTPUT_DIR,
+    input_type="matrix",
+    context_type="96",
+    collapse_to_SBS96=True,
+    cosmic_version=3.4,
+    exome=False,
+    genome_build="GRCh37",
+    exclude_signature_subgroups=[
+        'Chemotherapy_signatures',
+        'Immunosuppressants_signatures',
+        'Treatment_signatures',
+        'Tobacco_signatures'
+    ],
+    make_plots=False,
+    sample_reconstruction_plots=False,
+    verbose=True
+)
