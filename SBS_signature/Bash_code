@@ -1,0 +1,20 @@
+# -----------------------------
+# Load Python module (adjust as needed for your HPC environment)
+# -----------------------------
+module load Python/3.8.2-gimkl-2020a
+
+# Check Python version
+python --version
+
+# -----------------------------
+# Create and activate a virtual environment
+# -----------------------------
+python -m venv ~/sigprofiler_env
+source ~/sigprofiler_env/bin/activate
+
+# Upgrade pip and install SigProfilerAssignment
+pip install --upgrade pip
+pip install SigProfilerAssignment
+
+# Verify installation
+pip show SigProfilerAssignment
