@@ -1,0 +1,31 @@
+#!/bin/bash
+#
+#SBATCH --job-name=concat_GRM_parts
+#SBATCH --account=<ACCOUNT_NAME>
+#SBATCH --mem-per-cpu=2000
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --time=6:00:00
+#SBATCH --array=1-29   # Chromosomes 1-29
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# -----------------------------
+# Input arguments
+# -----------------------------
+# $1 = main GRM directory containing partitioned GRM files
+OUTDIR="$1"
+
+# Chromosome to process based on SLURM array task ID
+CHR="${SLURM_ARRAY_TASK_ID}"
+OUTFILE="${OUTDIR}/chr${CHR}_grm"
+
+# Number of partitions used in GCTA
+PARTS=50
+
+# Concatenate partitioned GRM files
+cat "${OUTDIR}/chr${CHR}_grm.part_${PARTS}_"*.grm.id > "${OUTFILE}.grm.id"
+cat "${OUTDIR}/chr${CHR}_grm.part_${PARTS}_"*.grm.bin > "${OUTFILE}.grm.bin"
+cat "${OUTDIR}/chr${CHR}_grm.part_${PARTS}_"*.grm.N.bin > "${OUTFILE}.grm.N.bin"
