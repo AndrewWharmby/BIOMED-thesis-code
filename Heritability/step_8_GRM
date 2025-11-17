@@ -1,0 +1,26 @@
+#!/bin/bash
+#SBATCH --job-name=make_grm
+#SBATCH --account=<ACCOUNT_NAME>
+#SBATCH --mem-per-cpu=4000
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=16
+#SBATCH --time=4:00:00
+#SBATCH --error=make_grm.err
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# -----------------------------
+# User-defined paths
+# -----------------------------
+GCTA_EXEC="<PATH_TO_GCTA_EXECUTABLE>"     # e.g., /path/to/gcta64
+OUT_DIR="<OUTPUT_DIRECTORY>"              # Directory containing TargetSNPs PLINK files
+BFILE_PREFIX="TargetSNPs"                 # PLINK binary prefix
+
+# Create GRM for target SNPs
+"${GCTA_EXEC}" \
+  --bfile "${OUT_DIR}/${BFILE_PREFIX}" \
+  --autosome-num 29 \
+  --make-grm \
+  --out "${OUT_DIR}/${BFILE_PREFIX}"
