@@ -1,0 +1,38 @@
+#!/bin/bash
+#SBATCH --job-name=extract_chr_genos
+#SBATCH --account=<ACCOUNT_NAME>
+#SBATCH --mem-per-cpu=2048
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --time=2:00:00
+#SBATCH --array=1-29   # Chromosomes 1 to 29
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+module load PLINK/1.09b6.16
+
+# -----------------------------
+# User-defined input arguments
+# -----------------------------
+INDIR_SEQ="$1"       # Input directory containing full sequence PLINK files
+SEQ_FILE="$2"        # Input PLINK file prefix (without .bed/.bim/.fam)
+OUTDIR="$3"          # Output directory
+MAF_THRESH="$4"      # Minor allele frequency threshold, e.g., 0.01
+
+# Chromosome to process based on SLURM array task ID
+CHR="chr${SLURM_ARRAY_TASK_ID}"
+OUTFILE="${OUTDIR}/${CHR}"
+
+# Extract genotypes for this chromosome
+plink \
+  --cow \
+  --const-fid 0 \
+  --bfile "${INDIR_SEQ}/${SEQ_FILE}" \
+  --chr "${CHR}" \
+  --make-bed \
+  --out "${OUTFILE}" \
+  --maf "${MAF_THRESH}" \
+  --hwe 0.001 \
+  --me 0.05 0.05
