@@ -1,0 +1,36 @@
+#!/bin/bash
+#SBATCH --job-name=extract_GRM_exclude_chr
+#SBATCH --account=<ACCOUNT_NAME>
+#SBATCH --mem-per-cpu=2048
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --time=2:00:00
+#SBATCH --array=1-29   # Chromosomes 1 to 29
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+module load PLINK/1.09b6.16
+
+# -----------------------------
+# Input arguments
+# -----------------------------
+# $1 = input directory containing filtered grm_geno_set files
+# $2 = output directory for filtered GRM per chromosome
+
+IN_DIR="$1"
+OUTDIR="$2"
+
+# Chromosome to exclude based on SLURM array task ID
+CHR="chr${SLURM_ARRAY_TASK_ID}"
+OUT_FILE="gs_grm_${CHR}"
+
+# Generate GRM excluding this chromosome
+plink \
+  --cow \
+  --const-fid 0 \
+  --bfile "${IN_DIR}/grm_geno_set" \
+  --not-chr "${CHR}" \
+  --make-bed \
+  --out "${OUTDIR}/${OUT_FILE}"
