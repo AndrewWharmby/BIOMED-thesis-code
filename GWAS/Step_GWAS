@@ -1,0 +1,48 @@
+#!/bin/bash
+#
+#       Use GCTA to calculate MLMA (LOCO)
+#
+#SBATCH --job-name=GWAS_MLMA
+#SBATCH --account=<ACCOUNT_NAME>
+#SBATCH --mem-per-cpu=2000
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=2
+#SBATCH --time=48:00:00
+#SBATCH --array=1-29   # Chromosomes 1-29
+
+set -o errexit
+set -o pipefail
+set -o nounset
+set -x
+
+# Chromosome to process based on SLURM array task ID
+CHR="${SLURM_ARRAY_TASK_ID}"
+
+# -----------------------------
+# User-defined input paths
+# -----------------------------
+BINARY_DIR="<PATH_TO_BINARY_FILES>"      # e.g., ./Genos/MAF_0.005
+GRM_DIR="<PATH_TO_GRM_FILES>"           # e.g., ./GRM
+PHENO_FILE="<PATH_TO_PHENOTYPE_FILE>"   # e.g., ./Phenos/SBS_rate.tsv
+OUT_DIR="<PATH_TO_OUTPUT_DIRECTORY>"    # e.g., ./Results/DNM_RATE_FINAL
+QCOVAR_FILE="<PATH_TO_QCOVAR_FILE>"     # e.g., covar.txt
+GCTA_EXEC="<PATH_TO_GCTA_EXECUTABLE>"   # e.g., /path/to/gcta64
+
+# Paths for this chromosome
+BINARY_FILE="${BINARY_DIR}/chr${CHR}"
+GRM_FILE="${GRM_DIR}/chr${CHR}_grm"
+OUT_FILE="${OUT_DIR}/chr${CHR}_mlma_loco"
+
+# Number of threads
+NT=${SLURM_CPUS_PER_TASK:-1}
+
+# Run GCTA MLMA LOCO
+"${GCTA_EXEC}" --mlma \
+  --bfile "${BINARY_FILE}" \
+  --grm "${GRM_FILE}" \
+  --pheno "${PHENO_FILE}" \
+  --qcovar "${QCOVAR_FILE}" \
+  --thread-num "${NT}" \
+  --out "${OUT_FILE}" \
+  --autosome-num 29 \
+  --autosome
